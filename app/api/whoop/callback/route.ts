@@ -44,13 +44,16 @@ export async function GET(request: NextRequest) {
     grant_type: "authorization_code",
     code,
     redirect_uri: redirectUri,
-    client_id: clientId,
-    client_secret: clientSecret,
   });
+
+  const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
   const tokenRes = await fetch(TOKEN_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${basicAuth}`,
+    },
     body: body.toString(),
   });
 
