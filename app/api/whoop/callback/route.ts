@@ -33,12 +33,6 @@ export async function GET(request: NextRequest) {
   const clientSecret = process.env.WHOOP_CLIENT_SECRET;
   const redirectUri = process.env.WHOOP_REDIRECT_URI;
 
-  console.log("[WHOOP Debug]", {
-    clientId_prefix: clientId?.slice(0, 8),
-    secret_len: clientSecret?.length,
-    redirectUri,
-  });
-
   if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json(
       { error: "server_config", message: "Missing WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET, or WHOOP_REDIRECT_URI env vars." },
@@ -69,16 +63,7 @@ export async function GET(request: NextRequest) {
 
   if (!tokenRes.ok) {
     return NextResponse.json(
-      {
-        error: "token_exchange_failed",
-        status: tokenRes.status,
-        details: tokenData,
-        debug: {
-          clientId_prefix: clientId.slice(0, 8),
-          secret_length: clientSecret.length,
-          redirect_uri: redirectUri,
-        },
-      },
+      { error: "token_exchange_failed", status: tokenRes.status, details: tokenData },
       { status: 502 }
     );
   }
