@@ -33,6 +33,12 @@ export async function GET(request: NextRequest) {
   const clientSecret = process.env.WHOOP_CLIENT_SECRET;
   const redirectUri = process.env.WHOOP_REDIRECT_URI;
 
+  console.log("[WHOOP Debug]", {
+    clientId_prefix: clientId?.slice(0, 8),
+    secret_len: clientSecret?.length,
+    redirectUri,
+  });
+
   if (!clientId || !clientSecret || !redirectUri) {
     return NextResponse.json(
       { error: "server_config", message: "Missing WHOOP_CLIENT_ID, WHOOP_CLIENT_SECRET, or WHOOP_REDIRECT_URI env vars." },
@@ -40,18 +46,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const body = new URLSearchParams({
-    grant_type: "authorization_code",
-    code,
-    client_id: clientId,
-    client_secret: clientSecret,
-    redirect_uri: redirectUri,
-  });
-
+  // Try JSON body — some WHOOP docs suggest this format
   const tokenRes = await fetch(TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+    }).toString(),
   });
 
   const tokenData = await tokenRes.json();
