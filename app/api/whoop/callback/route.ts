@@ -69,7 +69,16 @@ export async function GET(request: NextRequest) {
 
   if (!tokenRes.ok) {
     return NextResponse.json(
-      { error: "token_exchange_failed", status: tokenRes.status, details: tokenData },
+      {
+        error: "token_exchange_failed",
+        status: tokenRes.status,
+        details: tokenData,
+        debug: {
+          clientId_prefix: clientId.slice(0, 8),
+          secret_length: clientSecret.length,
+          redirect_uri: redirectUri,
+        },
+      },
       { status: 502 }
     );
   }
